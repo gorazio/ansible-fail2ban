@@ -1,6 +1,8 @@
 # defaults file for fail2ban
 ---
-fail2ban_loglevel: 3
+fail2ban_install: source
+fail2ban_source_version: "0.9.3"
+fail2ban_loglevel: INFO
 fail2ban_logtarget: /var/log/fail2ban.log
 fail2ban_syslog_target: /var/log/fail2ban.log
 fail2ban_syslog_facility: 1
@@ -28,3 +30,64 @@ fail2ban_services:
     logpath: /var/log/auth.log
     maxretry: 6
     findtime: 600
+
+#
+fail2ban_filters:
+#   - name: filter1
+#     failregex:
+#       - regex1
+#       - regex2
+#     ignoreregex:
+#       - regex3
+#       - regex4
+#   - name: filter2
+#     failregex:
+#       - regex5
+#       - regex6
+#     ignoreregex:
+#       - regex7
+#       - regex8
+
+fail2ban_actions:
+  # - name: actiontest1
+  #   definition:
+  #     actionstart: ""
+  #     actionstop: ""
+  #     actioncheck: ""
+  #     actionban: ban
+  #     actionunban: unban
+  #   init:
+  #   - name: login
+  #     value: login
+  #   - name: pass
+  #     value: pass
+  # - name: actiontest2
+  #   definition:
+  #     actionstart: start
+  #     actionstop: stop
+  #     actioncheck: check
+  #     actionban: ban
+  #     actionunban: unban
+  #   init:
+  #   - name: login
+  #     value: login
+  #   - name: pass
+  #     value: pass
+
+fail2ban_jails:
+  # - name: jail1
+  #   enabled: true
+  #   filter: filter
+  #   logpath: /tmp/log
+  #   maxretry: 5
+  #   findtime: 300
+  #   bantime: 300
+  #   banaction: banaction
+  # - name: jail2
+  #   enabled: true
+  #   filter: filter2
+  #   logpath: /tmp/log2
+  #   maxretry: 5
+  #   findtime: 300
+  #   bantime: 300
+  #   banaction: banaction

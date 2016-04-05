@@ -1,0 +1,20 @@
+[{{ item.name }}]
+
+enabled = {{ item.enabled }}
+
+#Name of the filter to be used by the jail to detect matches. Each single match by a filter increments the counter within the jail
+filter = {{ item.filter }}
+
+#Path to the log file which is provided to the filter
+logpath = {{ item.logpath }}
+
+#Number of matches (i.e. value of the counter) which triggers ban action on the IP.
+maxretry = {{ item.maxretry }}
+
+#The counter is set to zero if no match is found within "findtime" seconds.
+findtime = {{ item.findtime }}
+
+#Duration (in seconds) for IP to be banned for. Negative number for "permanent" ban.
+bantime = {{ item.bantime }}
+
+banaction = {{ item.banaction }}

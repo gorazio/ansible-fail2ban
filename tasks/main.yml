@@ -1,12 +1,10 @@
 # tasks file for fail2ban
 ---
-- name: install
-  apt:
-    name: fail2ban
-    state: latest
-    update_cache: true
-    cache_valid_time: "{{ apt_update_cache_valid_time | default(3600) }}"
-  tags: [configuration, fail2ban, fail2ban-install]
+- include: package.yml
+  when: fail2ban_install == 'package'
+
+- include: source.yml
+  when: fail2ban_install == 'source'
 
 - name: update configuration file - /etc/fail2ban/fail2ban.conf
   template:
@@ -18,30 +16,47 @@
   notify: restart fail2ban
   tags: [configuration, fail2ban, fail2ban-configuration]
 
-- name: update configuration file - /etc/fail2ban/jail.local
+- name: setup filters
   template:
-    src: etc/fail2ban/jail.local.j2
-    dest: /etc/fail2ban/jail.local
+    src: filter.conf.j2
+    dest: /etc/fail2ban/filter.d/{{ item.name }}.conf
     owner: root
     group: root
     mode: 0644
   notify: restart fail2ban
   tags: [configuration, fail2ban, fail2ban-configuration]
+  with_items: "{{fail2ban_filters}}"
+  when: fail2ban_filters
 
-- name: copy filters
-  copy:
-    src: "{{ fail2ban_filterd_path }}"
-    dest: /etc/fail2ban/filter.d/
+- name: setup actions
+  template:
+    src: action.conf.j2
+    dest: /etc/fail2ban/action.d/{{ item.name }}.conf
     owner: root
     group: root
     mode: 0644
-  when: fail2ban_filterd_path is defined
   notify: restart fail2ban
-  tags: [configuration, fail2ban, fail2ban-filters]
+  tags: [configuration, fail2ban, fail2ban-configuration]
+  with_items: "{{fail2ban_actions}}"
+  when: fail2ban_actions
 
-- name: start and enable service
-  service:
-    name: fail2ban
-    state: started
-    enabled: true
-  tags: [configuration, fail2ban, fail2ban-start-enable-service]
+- name: setup jails
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.d/{{ item.name }}.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart fail2ban
+  tags: [configuration, fail2ban, fail2ban-configuration]
+  with_items: "{{fail2ban_jails}}"
+  when: fail2ban_jails
+
+- name: check if fail2ban is up
+  command: fail2ban-client ping 2> /dev/null
+  register: result
+  ignore_errors: yes
+
+- name: start service
+  command: fail2ban-client start
+  when: "'Failed' in result.stderr"

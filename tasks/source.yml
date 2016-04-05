@@ -1,0 +1,20 @@
+---
+- name: install dependies
+  apt: name={{item}}
+       state=latest
+  with_items:
+    - unzip
+
+- name: Download and unpack fail2ban
+  unarchive: src=https://github.com/fail2ban/fail2ban/archive/{{ fail2ban_source_version }}.zip
+             dest=/tmp
+             copy=no
+             creates="/tmp/fail2ban-{{ fail2ban_source_version }}/setup.py"
+  register: fail2ban_downloaded
+
+- name: install fail2ban
+  command: python setup.py install
+  args:
+    chdir: /tmp/fail2ban-{{ fail2ban_source_version }}
+    creates: /usr/bin/fail2ban-client
+  when: fail2ban_downloaded.changed
